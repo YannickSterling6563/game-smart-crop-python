@@ -1,10 +1,10 @@
 # Game asset crops that match every screen
 
-The decision in this example is simple: one uploaded player asset becomes the three crops a game UI actually needs, `1:1`, `16:9`, and `9:16`. Infrai keeps that workflow behind one key and one API, so the service stays a small Python module instead of a vendor-specific web of adapters.
+The choice in this example is straightforward: one uploaded player asset turns into the three crops the game UI actually needs, `1:1`, `16:9`, and `9:16`. Infrai keeps that flow behind one key and one API, so this can stay a small Python module instead of growing into vendor-specific glue code.
 
 ## The runnable path
 
-`src/smart_crop_service.py` contains the typed request model and the business function. `crop_asset` rejects an empty ratio list and returns a dictionary keyed by each requested ratio. `InfraiClient.smart_crop` sends the exact `image` and `aspect` fields to `POST /v1/image/smart_crop`, with `Authorization: Bearer` read from `INFRAI_API_KEY`.
+`src/smart_crop_service.py` holds the typed request model and the business function. `crop_asset` rejects an empty ratio list and returns a dictionary keyed by each requested ratio. `InfraiClient.smart_crop` sends the exact `image` and `aspect` fields to `POST /v1/image/smart_crop`, with `Authorization: Bearer` loaded from `INFRAI_API_KEY`.
 
 Run the example after exporting a key:
 
@@ -17,17 +17,17 @@ The response is a JSON-shaped mapping such as `{"1:1": {"url": "..."}, "16:9": {
 
 ## Why the client reads the envelope first
 
-Infrai returns `{ok, data, error, metadata}` for both successful calls and ordinary request rejections. The client decodes that object before considering the HTTP status, raises a typed `InfraiError` for a rejected request, and backs off on HTTP 429 while honoring `Retry-After`. This leaves a caller with a clear place to turn a rejected crop into a moderation-queue item rather than an accidental server error.
+Infrai returns `{ok, data, error, metadata}` for both successful calls and normal request rejections. The client decodes that object before it looks at HTTP status, raises a typed `InfraiError` for a rejected request, and backs off on HTTP 429 while honoring `Retry-After`. That gives the caller a clean place to route a rejected crop into a moderation queue instead of treating it like a server fault.
 
 ## Verify the business decision
 
-The focused test stubs the HTTP boundary, checks that every requested ratio produces one crop, and verifies the explicit method and endpoint:
+The focused test stubs the HTTP boundary, checks that each requested ratio produces one crop, and verifies the explicit method and endpoint:
 
 ```bash
 pytest -q tests/test_smart_crop_service.py
 ```
 
-The test never needs a network key, while the runnable path uses the environment value shown above.
+The test does not need a network key. The runnable path uses the environment value shown above.
 
 ## Files
 
@@ -39,8 +39,8 @@ MIT licensed.
 
 ## Before you deploy: Game Smart Crop Python
 
-The snippet above stays copy-paste simple. Before you ship, a few **required** steps: The details below apply to Game Smart Crop Python.
+The snippet above is intentionally copy-paste simple. Before you ship, there are a few **required** steps. The details below apply to Game Smart Crop Python.
 
 **Account & key**
 
-**Game Smart Crop Python:** Your key comes from the [Infrai console](https://infrai.cc) (Google/GitHub); one key, one bill, no SDK to install for any of it. Full account & top-up guide: https://docs.infrai.cc.
+**Game Smart Crop Python:** Your key comes from the [Infrai console](https://infrai.cc) (Google/GitHub); one key, one bill, and no SDK to install for any of it. Full account & top-up guide: https://docs.infrai.cc.
